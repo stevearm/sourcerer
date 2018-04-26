@@ -1,0 +1,14 @@
+# Define the structure relative to this file's directory.
+# For each key:
+#  - if the value is a string it is expected to be a git remote bound to "origin"
+#  - if the value is a dictionary, the key is a folder
+#  - if the value is an array, it should be full of 2-element arrays: ["remote-name", "remote-url"]
+
+# This will result in standard repos in ./sourcerer and ./java/java-util,
+# and a repo in ./gollum with two remotes: origin and upstream
+sourcerer: "git@github.com:stevearm/sourcerer.git"
+java:
+  java-util: "git@github.com:stevearm/java-util.git"
+gollum:
+  - ["origin", "git@github.com:stevearm/gollum.git"]
+  - ["upstream", "git@github.com:gollum/gollum.git"]
