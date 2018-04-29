@@ -2,6 +2,8 @@
 import argparse
 import sys
 
+import colorama
+
 import sourcerer.config
 
 def main():
@@ -17,6 +19,7 @@ def main():
 
     args = parser.parse_args()
     if "func" in args:
+        colorama.init()
         if not args.func(args):
             sys.exit(1)
     else:
@@ -25,17 +28,27 @@ def main():
 
 def status(args):
     status = sourcerer.config.compareConfigToFilesystem()
-    print("Managed: {}".format(len(status["managed"])))
-    for path, pathConfig in status["managed"].items():
-        print("  {} ({})".format(path, pathConfig))
+    if len(status["managed"]):
+        print("Managed folders ({})".format(len(status["managed"])))
+        print()
+        for path, pathConfig in status["managed"].items():
+            print(colorama.Style.DIM + "  {} ({})".format(path, pathConfig) + colorama.Style.RESET_ALL)
+        print()
 
-    print("Missing: {}".format(len(status["missing"])))
-    for path, pathConfig in status["missing"].items():
-        print("  {} ({})".format(path, pathConfig))
+    if len(status["missing"]):
+        print("Missing folder ({})".format(len(status["missing"])))
+        print()
+        for path, pathConfig in status["missing"].items():
+            print(colorama.Fore.RED + "  {} ({})".format(path, pathConfig) + colorama.Style.RESET_ALL)
+        print()
 
-    print("Unmanaged: {}".format(len(status["unmanaged"])))
-    for path in status["unmanaged"]:
-        print("  {}".format(path))
+    if len(status["unmanaged"]):
+        print("Unmanaged ({})".format(len(status["unmanaged"])))
+        print()
+        for path in status["unmanaged"]:
+            print(colorama.Style.DIM + "  {}".format(path) + colorama.Style.RESET_ALL)
+        print()
+
     return True
 
 def fetch(args):
