@@ -39,8 +39,11 @@ def status(args):
         for path, pathConfig in status["managed"].items():
             stats = sourcerer.git.gatherStats(path)
 
+            branchesMatch = pathConfig == stats["remotes"]
+
             flags = [[stats["clean"], "*"],
-                     [stats["masterPushed"], "↑"]]
+                     [stats["masterPushed"], "↑"],
+                     [branchesMatch, "☇"]]
             flagString = "".join(map(lambda x: " " if x[0] else x[1], flags))
 
             # Dim unless one of the flags is false
@@ -74,4 +77,4 @@ def fetch(args):
     status = sourcerer.config.compareConfigToFilesystem()
     if len(status["managed"]):
         for path, pathConfig in status["managed"].items():
-            sourcerer.git.fetch(path, map(lambda x: x[0], pathConfig))
+            sourcerer.git.fetch(path, pathConfig.keys())

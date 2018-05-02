@@ -13,4 +13,8 @@ def gatherStats(path):
 def fetch(path, remotes):
     repo = git.Repo(path)
     for remoteName in remotes:
-        repo.remote(remoteName).fetch()
+        try:
+            remote = repo.remote(remoteName)
+            remote.fetch()
+        except ValueError:
+            raise Exception("{} has no remote {}".format(path, remoteName))

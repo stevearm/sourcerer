@@ -24,7 +24,7 @@ def compareConfigToFilesystem():
             # We've found a config for this folder
             if missingPath == currentFolder:
                 # Move the config from missing to managed
-                managed[missingPath] = missingConfig
+                managed[missingPath] = dict(missingConfig)
                 del missing[missingPath]
 
                 # Stop walking this folder
