@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import argparse
+import functools
 import sys
 
 import colorama
@@ -37,11 +38,16 @@ def status(args):
         print()
         for path, pathConfig in status["managed"].items():
             stats = sourcerer.git.gatherStats(path)
-            clean = " " if stats["clean"] else "*"
-            masterPushed = " " if stats["masterPushed"] else "↑"
-            color = colorama.Style.DIM if stats["clean"] and stats["masterPushed"] else ""
+
+            flags = [[stats["clean"], "*"],
+                     [stats["masterPushed"], "↑"]]
+            flagString = "".join(map(lambda x: " " if x[0] else x[1], flags))
+
+            # Dim unless one of the flags is false
+            color = colorama.Style.DIM if functools.reduce(lambda x, y: x and y[0], flags, True) else ""
+
             print(color +
-                  "  {clean}{masterPushed} {path}".format(clean=clean, masterPushed=masterPushed, path=path) +
+                  "  {flags} {path}".format(flags=flagString, path=path) +
                   colorama.Style.RESET_ALL)
         print()
 
