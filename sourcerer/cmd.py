@@ -14,6 +14,9 @@ def main():
     task = tasks.add_parser("status")
     task.set_defaults(func=status)
 
+    task = tasks.add_parser("clone")
+    task.set_defaults(func=clone)
+
     task = tasks.add_parser("fetch")
     task.set_defaults(func=fetch)
 
@@ -51,5 +54,8 @@ def status(args):
 
     return True
 
+def clone(args):
+    raise Exception("Should clone all missing folders")
+
 def fetch(args):
-    raise Exception("Not yet implemented")
+    raise Exception("Should fetch on all managed folders")
