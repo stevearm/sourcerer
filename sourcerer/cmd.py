@@ -74,7 +74,11 @@ def status(args):
 
 
 def clone(args):
-    raise Exception("Should clone all missing folders")
+    status = sourcerer.config.compareConfigToFilesystem()
+    for path, pathConfig in status["missing"].items():
+        sourcerer.git.clone(path, pathConfig)
+    for path, pathConfig in status["managed"].items():
+        sourcerer.git.ensureRemotes(path, pathConfig)
 
 
 def fetch(args):

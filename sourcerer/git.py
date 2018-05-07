@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+import os
+
 import git
 
 def gatherStats(path):
@@ -18,3 +20,25 @@ def fetch(path, remoteNames):
             remote.fetch()
         except ValueError:
             raise Exception("{} has no remote {}".format(path, remoteName))
+
+
+""" Clones from origin to the given path and add any extra remotes
+"""
+def clone(path, remotes):
+    if os.path.isdir(path):
+        raise Exception("Cannot clone into existing location")
+    repo = git.Repo.clone_from(remotes["origin"], path)
+    ensureRemotes(path, remotes)
+
+
+""" Ensures the repo at the given path has all specified remotes
+"""
+def ensureRemotes(path, remotes):
+    repo = git.Repo(path)
+    for remoteName, remoteUrl in remotes.items():
+        try:
+            remote = repo.remote(remoteName)
+            if remoteUrl != next(remote.urls):
+                raise Exception("{} already has {} pointing to {}".format(path, remoteName, remoteUrl))
+        except ValueError:
+            git.Remote.add(repo, remoteName, remoteUrl)
