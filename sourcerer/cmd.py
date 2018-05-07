@@ -14,13 +14,13 @@ def main():
     parser.add_argument("--verbose", action="store_true", help="More logs")
     tasks = parser.add_subparsers(title="Commands")
 
-    task = tasks.add_parser("status")
+    task = tasks.add_parser("status", help="Show the status of all folders")
     task.set_defaults(func=status)
 
-    task = tasks.add_parser("clone")
+    task = tasks.add_parser("clone", help="Clone any missing repos and add any missing remotes")
     task.set_defaults(func=clone)
 
-    task = tasks.add_parser("fetch")
+    task = tasks.add_parser("fetch", help="Fetch all remotes in config")
     task.set_defaults(func=fetch)
 
     args = parser.parse_args()
