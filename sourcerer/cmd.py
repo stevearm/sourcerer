@@ -8,6 +8,7 @@ import colorama
 import sourcerer.config
 import sourcerer.git
 
+
 def main():
     parser = argparse.ArgumentParser(description="Manage source folders")
     parser.add_argument("--verbose", action="store_true", help="More logs")
@@ -30,6 +31,7 @@ def main():
     else:
         parser.print_usage()
         sys.exit(1)
+
 
 def status(args):
     status = sourcerer.config.compareConfigToFilesystem()
@@ -70,11 +72,14 @@ def status(args):
 
     return True
 
+
 def clone(args):
     raise Exception("Should clone all missing folders")
+
 
 def fetch(args):
     status = sourcerer.config.compareConfigToFilesystem()
     if len(status["managed"]):
         for path, pathConfig in status["managed"].items():
+            print("{} ({})".format(path, ", ".join(pathConfig.keys())))
             sourcerer.git.fetch(path, pathConfig.keys())

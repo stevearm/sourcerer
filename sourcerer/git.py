@@ -10,9 +10,9 @@ def gatherStats(path):
     return dict(clean=(not repo.is_dirty()), masterPushed=masterPushed, remotes=remotes)
 
 
-def fetch(path, remotes):
+def fetch(path, remoteNames):
     repo = git.Repo(path)
-    for remoteName in remotes:
+    for remoteName in remoteNames:
         try:
             remote = repo.remote(remoteName)
             remote.fetch()

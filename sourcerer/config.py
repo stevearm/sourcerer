@@ -24,7 +24,7 @@ def compareConfigToFilesystem():
             # We've found a config for this folder
             if missingPath == currentFolder:
                 # Move the config from missing to managed
-                managed[missingPath] = dict(missingConfig)
+                managed[missingPath] = missingConfig
                 del missing[missingPath]
 
                 # Stop walking this folder
@@ -54,11 +54,23 @@ def _flattenConfig(config):
             if isinstance(value, dict):
                 recurse(fullpath, value)
             elif isinstance(value, list):
-                results[fullpath] = value
+                results[fullpath] = dict()
+                for remoteConfig in value:
+                    if not isinstance(remoteConfig, list) or len(remoteConfig) != 2:
+                        raise Exception("Incorrect remote config: {} - {}".format(key, remoteConfig))
+                    if remoteConfig[0] in results[fullpath]:
+                        raise Exception("Duplicate remote config: {} - {}".format(key, remoteConfig[0]))
+                    results[fullpath][remoteConfig[0]] = remoteConfig[1]
             elif isinstance(value, str):
-                results[fullpath] = [["origin", value]]
+                results[fullpath] = dict(origin=value)
             else:
                 raise Exception("Unhandled config type: {}: {}<{}>".format(fullpath, value, type(value)))
 
     recurse(None, config)
+
+    # Require an 'origin' remote
+    for key, value in results.items():
+        if "origin" not in value:
+            raise ValueError("{} has no origin: {}".format(key, value))
+
     return results
