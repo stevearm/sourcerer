@@ -102,12 +102,14 @@ def add(args):
     if args.path.startswith(os.sep):
         print("Must pass in relative path")
         return False
-    repo = sourcerer.git.gatherStats(args.path)
-    sourcerer.config.addToConfig(args.path, repo["remotes"])
+    path = args.path.rstrip(os.sep)
+    repo = sourcerer.git.gatherStats(path)
+    sourcerer.config.addToConfig(path, repo["remotes"])
 
 
 def ignore(args):
     if args.path.startswith(os.sep):
         print("Must pass in relative path")
         return False
-    sourcerer.config.ignoreInConfig(args.path)
+    path = args.path.rstrip(os.sep)
+    sourcerer.config.ignoreInConfig(path)
