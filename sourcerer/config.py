@@ -32,8 +32,12 @@ def compareConfigToFilesystem():
 
             # We've found a config for this folder
             if missingPath == currentFolder:
-                # Move the config from missing to managed
-                managed[missingPath] = missingConfig
+                if missingConfig is False:
+                    # This is an ignored path so drop it
+                    pass
+                else:
+                    # Move the config from missing to managed
+                    managed[missingPath] = missingConfig
                 del missing[missingPath]
 
                 # Stop walking this folder
@@ -75,6 +79,8 @@ def _flattenConfig(config):
                     results[fullpath][remoteConfig[0]] = remoteConfig[1]
             elif isinstance(value, str):
                 results[fullpath] = dict(origin=value)
+            elif isinstance(value, bool):
+                results[fullpath] = value
             else:
                 raise Exception("Unhandled config type: {}: {}<{}>".format(fullpath, value, type(value)))
 
@@ -82,13 +88,27 @@ def _flattenConfig(config):
 
     # Require an 'origin' remote
     for key, value in results.items():
-        if "origin" not in value:
+        if isinstance(value, dict) and "origin" not in value:
             raise ValueError("{} has no origin: {}".format(key, value))
 
     return results
 
 
 def addToConfig(path, remotes):
+    if len(remotes) == 1 and "origin" in remotes:
+        node = remotes["origin"]
+    else:
+        node = list()
+        for key, value in remotes.items():
+            node.append([key, value])
+    _addNodeToConfig(path, node)
+
+
+def ignoreInConfig(path):
+    _addNodeToConfig(path, False)
+
+
+def _addNodeToConfig(path, node):
     config = None
     try:
         with open(".sourcerer.yaml", "r") as configFile:
@@ -105,12 +125,7 @@ def addToConfig(path, remotes):
             configNode[part] = dict()
         configNode = configNode[part]
 
-    if len(remotes) == 1 and "origin" in remotes:
-        configNode[pathParts[-1]] = remotes["origin"]
-    else:
-        configNode[pathParts[-1]] = list()
-        for key, value in remotes.items():
-            configNode[pathParts[-1]].append([key, value])
+    configNode[pathParts[-1]] = node
 
     with open(".sourcerer.yaml", "w") as configFile:
         configFile.write(yaml.dump(config))

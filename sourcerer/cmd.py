@@ -28,6 +28,10 @@ def main():
     task.add_argument("path", help="The path to add")
     task.set_defaults(func=add)
 
+    task = tasks.add_parser("ignore", help="Ignore an unmanaged path")
+    task.add_argument("path", help="The path to ignore")
+    task.set_defaults(func=ignore)
+
     args = parser.parse_args()
     if "func" in args:
         colorama.init()
@@ -100,3 +104,10 @@ def add(args):
         return False
     repo = sourcerer.git.gatherStats(args.path)
     sourcerer.config.addToConfig(args.path, repo["remotes"])
+
+
+def ignore(args):
+    if args.path.startswith(os.sep):
+        print("Must pass in relative path")
+        return False
+    sourcerer.config.ignoreInConfig(args.path)
