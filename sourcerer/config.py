@@ -6,8 +6,17 @@ import yaml
 
 
 def compareConfigToFilesystem():
-    with open(".sourcerer.yaml", "r") as configFile:
-        config = yaml.load(configFile)
+    config = None
+    try:
+        with open(".sourcerer.yaml", "r") as configFile:
+            config = yaml.load(configFile)
+    except FileNotFoundError:
+        pass
+
+    if config is None:
+        for root, dirs, files in os.walk("."):
+            return dict(managed=dict(), unmanaged=list(dirs), missing=dict())
+
     managed = {}
     unmanaged = []
     missing = _flattenConfig(config)
@@ -46,6 +55,9 @@ def compareConfigToFilesystem():
 
 
 def _flattenConfig(config):
+    if config is None:
+        config = dict()
+
     results = dict()
 
     def recurse(prefix, node):
@@ -74,3 +86,31 @@ def _flattenConfig(config):
             raise ValueError("{} has no origin: {}".format(key, value))
 
     return results
+
+
+def addToConfig(path, remotes):
+    config = None
+    try:
+        with open(".sourcerer.yaml", "r") as configFile:
+            config = yaml.load(configFile)
+    except FileNotFoundError:
+        pass
+    if config is None:
+        config = dict()
+
+    pathParts = path.split(os.sep)
+    configNode = config
+    for part in pathParts[:-1]:
+        if part not in configNode:
+            configNode[part] = dict()
+        configNode = configNode[part]
+
+    if len(remotes) == 1 and "origin" in remotes:
+        configNode[pathParts[-1]] = remotes["origin"]
+    else:
+        configNode[pathParts[-1]] = list()
+        for key, value in remotes.items():
+            configNode[pathParts[-1]].append([key, value])
+
+    with open(".sourcerer.yaml", "w") as configFile:
+        configFile.write(yaml.dump(config))

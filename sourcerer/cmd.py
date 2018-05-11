@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import argparse
+import os
 import functools
 import sys
 
@@ -22,6 +23,10 @@ def main():
 
     task = tasks.add_parser("fetch", help="Fetch all remotes in config")
     task.set_defaults(func=fetch)
+
+    task = tasks.add_parser("add", help="Add an unmanaged (or partially managed) repo to the config")
+    task.add_argument("path", help="The path to add")
+    task.set_defaults(func=add)
 
     args = parser.parse_args()
     if "func" in args:
@@ -87,3 +92,11 @@ def fetch(args):
         for path, pathConfig in status["managed"].items():
             print("{} ({})".format(path, ", ".join(pathConfig.keys())))
             sourcerer.git.fetch(path, pathConfig.keys())
+
+
+def add(args):
+    if args.path.startswith(os.sep):
+        print("Must pass in relative path")
+        return False
+    repo = sourcerer.git.gatherStats(args.path)
+    sourcerer.config.addToConfig(args.path, repo["remotes"])
