@@ -10,12 +10,15 @@ import sourcerer.config
 import sourcerer.git
 
 
+FLAGS=dict(dirty="*", unpushedMaster="↑", unmanagedRemote="☇")
+
 def main():
     parser = argparse.ArgumentParser(description="Manage source folders")
     parser.add_argument("--verbose", action="store_true", help="More logs")
     tasks = parser.add_subparsers(title="Commands")
 
-    task = tasks.add_parser("status", help="Show the status of all folders")
+    task = tasks.add_parser("status", help="Show the status of all folders",
+                            description="Flags: {}".format(", ".join(["{}: {}".format(key, value) for key, value in sorted(FLAGS.items())])))
     task.set_defaults(func=status)
 
     task = tasks.add_parser("clone", help="Clone any missing repos and add any missing remotes")
@@ -52,11 +55,11 @@ def status(args):
         for path, pathConfig in status["managed"].items():
             stats = sourcerer.git.gatherStats(path)
 
-            branchesMatch = pathConfig == stats["remotes"]
+            remotesMatch = pathConfig == stats["remotes"]
 
-            flags = [[stats["clean"], "*"],
-                     [stats["masterPushed"], "↑"],
-                     [branchesMatch, "☇"]]
+            flags = [[stats["clean"],        FLAGS["dirty"]],
+                     [stats["masterPushed"], FLAGS["unpushedMaster"]],
+                     [remotesMatch,          FLAGS["unmanagedRemote"]]]
             flagString = "".join(map(lambda x: " " if x[0] else x[1], flags))
 
             # Dim unless one of the flags is false
