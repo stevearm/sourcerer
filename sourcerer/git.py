@@ -12,14 +12,14 @@ def gatherStats(path):
     return dict(clean=(not repo.is_dirty()), masterPushed=masterPushed, remotes=remotes)
 
 
-def fetch(path, remoteNames):
-    repo = git.Repo(path)
+def fetch(path, remoteNames, purge, tags):
+    repo = git.Git(path)
     for remoteName in remoteNames:
-        try:
-            remote = repo.remote(remoteName)
-            remote.fetch()
-        except ValueError:
-            raise Exception("{} has no remote {}".format(path, remoteName))
+        # This uses the command-line interface
+        # https://github.com/gitpython-developers/GitPython/blob/05e3b0e58487c8515846d80b9fffe63bdcce62e8/git/cmd.py#L970
+        response = repo.fetch(remoteName, p=purge, t=tags)
+        if response != "":
+            raise Exception("{} fetch {}: {}".format(path, remoteName, response))
 
 
 """ Clones from origin to the given path and add any extra remotes

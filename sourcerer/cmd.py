@@ -22,6 +22,8 @@ def main():
     task.set_defaults(func=clone)
 
     task = tasks.add_parser("fetch", help="Fetch all remotes in config")
+    task.add_argument("--purge", action="store_true", help="Purge when doing the fetch")
+    task.add_argument("--no-tags", action="store_true", help="Skip fetching tags")
     task.set_defaults(func=fetch)
 
     task = tasks.add_parser("add", help="Add an unmanaged (or partially managed) repo to the config")
@@ -95,7 +97,7 @@ def fetch(args):
     if len(status["managed"]):
         for path, pathConfig in status["managed"].items():
             print("{} ({})".format(path, ", ".join(pathConfig.keys())))
-            sourcerer.git.fetch(path, pathConfig.keys())
+            sourcerer.git.fetch(path, pathConfig.keys(), args.purge, not args.no_tags)
 
 
 def add(args):
