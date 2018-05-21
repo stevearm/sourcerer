@@ -25,7 +25,7 @@ def main():
     task.set_defaults(func=clone)
 
     task = tasks.add_parser("fetch", help="Fetch all remotes in config")
-    task.add_argument("--purge", action="store_true", help="Purge when doing the fetch")
+    task.add_argument("--purge", "-p", action="store_true", help="Purge when doing the fetch")
     task.add_argument("--no-tags", action="store_true", help="Skip fetching tags")
     task.set_defaults(func=fetch)
 
