@@ -128,4 +128,4 @@ def _addNodeToConfig(path, node):
     configNode[pathParts[-1]] = node
 
     with open(".sourcerer.yaml", "w") as configFile:
-        configFile.write(yaml.dump(config))
+        configFile.write(yaml.dump(config, default_flow_style=False))
