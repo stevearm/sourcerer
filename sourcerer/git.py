@@ -8,8 +8,23 @@ def gatherStats(path):
     repo = git.Repo(path)
     remotes = dict(map(lambda x: (x.name, next(x.urls)), repo.remotes))
 
-    masterPushed = repo.remotes.origin.refs.master.object == repo.refs.master.object
-    return dict(clean=(not repo.is_dirty()), masterPushed=masterPushed, remotes=remotes)
+    unpushed = list()
+    localBranches = dict([(x.name, x) for x in repo.branches])
+    for branchName, branch in localBranches.items():
+        tracking = branch.tracking_branch()
+        if tracking is None:
+            # `branch` has no upstream
+            unpushed.append(branchName)
+        elif tracking.remote_name == ".":
+            # `branch` has another local branch set as upstream
+            localBranchName = tracking.remote_head
+            if localBranchName not in localBranches or branch.object != localBranches[localBranchName].object:
+                unpushed.append(branchName)
+        else:
+            # `branch` has a remote branch set as upstream
+            if branch.object != tracking.object:
+                unpushed.append(branchName)
+    return dict(clean=(not repo.is_dirty()), unpushed=unpushed, remotes=remotes)
 
 
 def fetch(path, remoteNames, purge, tags):

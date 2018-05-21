@@ -10,7 +10,7 @@ import sourcerer.config
 import sourcerer.git
 
 
-FLAGS=dict(dirty="*", unpushedMaster="↑", unmanagedRemote="☇")
+FLAGS=dict(dirty="*", unpushed="↣", unmanagedRemote="⤚")
 
 def main():
     parser = argparse.ArgumentParser(description="Manage source folders")
@@ -57,9 +57,9 @@ def status(args):
 
             remotesMatch = pathConfig == stats["remotes"]
 
-            flags = [[stats["clean"],        FLAGS["dirty"]],
-                     [stats["masterPushed"], FLAGS["unpushedMaster"]],
-                     [remotesMatch,          FLAGS["unmanagedRemote"]]]
+            flags = [[stats["clean"],              FLAGS["dirty"]],
+                     [len(stats["unpushed"]) == 0, FLAGS["unpushed"]],
+                     [remotesMatch,                FLAGS["unmanagedRemote"]]]
             flagString = "".join(map(lambda x: " " if x[0] else x[1], flags))
 
             # Dim unless one of the flags is false
