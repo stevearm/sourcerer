@@ -7,10 +7,11 @@ import sys
 import colorama
 
 import sourcerer.config
+import sourcerer.diffutils
 import sourcerer.git
 
 
-FLAGS=dict(dirty="*", unpushed="↣", unmanagedRemote="⤚")
+FLAGS=dict(dirty="*", unpushed="↑", unmanagedRemote="⇞")
 
 def main():
     parser = argparse.ArgumentParser(description="Manage source folders")
@@ -19,6 +20,7 @@ def main():
 
     task = tasks.add_parser("status", help="Show the status of all folders",
                             description="Flags: {}".format(", ".join(["{}: {}".format(key, value) for key, value in sorted(FLAGS.items())])))
+    task.add_argument("path", nargs="?", help="The path to show details for")
     task.set_defaults(func=status)
 
     task = tasks.add_parser("clone", help="Clone any missing repos and add any missing remotes")
@@ -48,6 +50,9 @@ def main():
 
 
 def status(args):
+    if args.path:
+        return singleDirStatus(args)
+
     status = sourcerer.config.compareConfigToFilesystem()
     if len(status["managed"]):
         print("Managed folders ({})".format(len(status["managed"])))
@@ -85,6 +90,42 @@ def status(args):
         print()
 
     return True
+
+
+def singleDirStatus(args):
+    status = sourcerer.config.compareConfigToFilesystem()
+    path = args.path
+
+    if path in status["managed"]:
+        pathConfig = status["managed"][path]
+        stats = sourcerer.git.gatherStats(path)
+
+        if pathConfig != stats["remotes"]:
+            print("Remotes are unmanaged or urls don't match config")
+            for name, urls in sourcerer.diffutils.dictDiff(pathConfig, stats["remotes"]).items():
+                if urls[0] != urls[1]:
+                    print(" {}  {}".format(FLAGS["unmanagedRemote"], name))
+            print()
+
+        if len(stats["unpushed"]):
+            print("Branches with no upstream or that differ from upstream")
+            for branch in stats["unpushed"]:
+                print(" {}  {}".format(FLAGS["unpushed"], branch))
+            print()
+
+        return True
+
+
+    if path in status["missing"]:
+        print("This folder is missing: `srcr clone`")
+        return True
+
+    if path in status["unmanaged"]:
+        print("Unmanaged folder")
+        return True
+
+    print("Couldn't understand that folder")
+    return False
 
 
 def clone(args):
