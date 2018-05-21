@@ -21,3 +21,5 @@ This is a tool for keeping your source folders up to date, tracking what hasn't 
   * `status` will have to walk up the tree looking for a config, and error out if none is found
   * `status` will have to handle the root not being the cwd
   * Should add `init` which creates a blank file
+* Need a way to fast forward
+  * When we run `srcr fetch` it pulls new remote commits, then master is behind and it looks like unpushed. Need a way to handle this better
