@@ -94,7 +94,7 @@ def status(args):
 
 def singleDirStatus(args):
     status = sourcerer.config.compareConfigToFilesystem()
-    path = args.path
+    path = args.path.rstrip("/")
 
     if path in status["managed"]:
         pathConfig = status["managed"][path]
