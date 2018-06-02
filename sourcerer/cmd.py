@@ -140,10 +140,11 @@ def singleDirStatus(args):
 
 
 def clone(args):
-    if not sourcerer.config.isBaseDir():
-        print("Only supported when at base dir")
+    baseDir = sourcerer.config.findBaseDir()
+    if baseDir is None:
+        print("Could not find config")
         return False
-    status = sourcerer.config.compareConfigToFilesystem()
+    status = sourcerer.config.compareConfigToFilesystem(baseDir)
     for path, pathConfig in status["missing"].items():
         sourcerer.git.clone(path, pathConfig)
     for path, pathConfig in status["managed"].items():
@@ -151,10 +152,11 @@ def clone(args):
 
 
 def fetch(args):
-    if not sourcerer.config.isBaseDir():
-        print("Only supported when at base dir")
+    baseDir = sourcerer.config.findBaseDir()
+    if baseDir is None:
+        print("Could not find config")
         return False
-    status = sourcerer.config.compareConfigToFilesystem()
+    status = sourcerer.config.compareConfigToFilesystem(baseDir)
     if len(status["managed"]):
         for path, pathConfig in status["managed"].items():
             print("{} ({})".format(path, ", ".join(pathConfig.keys())))

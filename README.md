@@ -17,6 +17,6 @@ This is a tool for keeping your source folders up to date, tracking what hasn't 
 1. Find out about more commands: `srcr --help`
 
 ## To Do
-* Update more commands to handle non-base-dir: clone, fetch, add, ignore
+* Update more commands to handle non-base-dir: add, ignore
 * Need a way to fast forward
   * When we run `srcr fetch` it pulls new remote commits, then master is behind and it looks like unpushed. Need a way to handle this better
