@@ -31,6 +31,9 @@ def main():
     task.add_argument("--no-tags", action="store_true", help="Skip fetching tags")
     task.set_defaults(func=fetch)
 
+    task = tasks.add_parser("init", help="Initialize the current folder as a sourcerer root")
+    task.set_defaults(func=init)
+
     task = tasks.add_parser("add", help="Add an unmanaged (or partially managed) repo to the config")
     task.add_argument("path", help="The path to add")
     task.set_defaults(func=add)
@@ -53,7 +56,11 @@ def status(args):
     if args.path:
         return singleDirStatus(args)
 
-    status = sourcerer.config.compareConfigToFilesystem()
+    baseDir = sourcerer.config.findBaseDir()
+    if baseDir is None:
+        print("Could not find config")
+        return False
+    status = sourcerer.config.compareConfigToFilesystem(baseDir)
     if len(status["managed"]):
         print("Managed folders ({})".format(len(status["managed"])))
         print()
@@ -93,7 +100,11 @@ def status(args):
 
 
 def singleDirStatus(args):
-    status = sourcerer.config.compareConfigToFilesystem()
+    baseDir = sourcerer.config.findBaseDir()
+    if baseDir is None:
+        print("Could not find config")
+        return False
+    status = sourcerer.config.compareConfigToFilesystem(baseDir)
     path = args.path.rstrip("/")
 
     if path in status["managed"]:
@@ -129,6 +140,9 @@ def singleDirStatus(args):
 
 
 def clone(args):
+    if not sourcerer.config.isBaseDir():
+        print("Only supported when at base dir")
+        return False
     status = sourcerer.config.compareConfigToFilesystem()
     for path, pathConfig in status["missing"].items():
         sourcerer.git.clone(path, pathConfig)
@@ -137,6 +151,9 @@ def clone(args):
 
 
 def fetch(args):
+    if not sourcerer.config.isBaseDir():
+        print("Only supported when at base dir")
+        return False
     status = sourcerer.config.compareConfigToFilesystem()
     if len(status["managed"]):
         for path, pathConfig in status["managed"].items():
@@ -144,9 +161,19 @@ def fetch(args):
             sourcerer.git.fetch(path, pathConfig.keys(), args.purge, not args.no_tags)
 
 
+def init(args):
+    if sourcerer.config.findBaseDir() is not None:
+        print("Already inside a root")
+        return False
+    sourcerer.config.initBaseDir()
+
+
 def add(args):
     if args.path.startswith(os.sep):
         print("Must pass in relative path")
+        return False
+    if not sourcerer.config.isBaseDir():
+        print("Only supported when at base dir")
         return False
     path = args.path.rstrip(os.sep)
     repo = sourcerer.git.gatherStats(path)
@@ -156,6 +183,9 @@ def add(args):
 def ignore(args):
     if args.path.startswith(os.sep):
         print("Must pass in relative path")
+        return False
+    if not sourcerer.config.isBaseDir():
+        print("Only supported when at base dir")
         return False
     path = args.path.rstrip(os.sep)
     sourcerer.config.ignoreInConfig(path)

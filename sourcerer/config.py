@@ -4,25 +4,42 @@ import os
 import os.path
 import yaml
 
+__yamlFileName = ".sourcerer.yaml"
 
-def compareConfigToFilesystem():
-    config = None
-    try:
-        with open(".sourcerer.yaml", "r") as configFile:
-            config = yaml.load(configFile)
-    except FileNotFoundError:
-        pass
+def findBaseDir(wd=""):
+    while True:
+        if os.path.isfile(os.path.join(wd, __yamlFileName)):
+            return wd
+        if os.path.abspath(wd) == "/":
+            return None
+        if wd is "":
+            wd = ".."
+        else:
+            wd = os.path.join(wd, "..")
 
-    if config is None:
-        for root, dirs, files in os.walk("."):
-            return dict(managed=dict(), unmanaged=list(dirs), missing=dict())
+
+def isBaseDir():
+    return os.path.isfile(__yamlFileName)
+
+
+def initBaseDir():
+    with open(__yamlFileName, "w") as configFile:
+        configFile.write(yaml.dump(dict(), default_flow_style=False))
+
+
+def compareConfigToFilesystem(baseDir):
+    with open(os.path.join(baseDir, __yamlFileName), "r") as configFile:
+        config = yaml.load(configFile)
 
     managed = {}
     unmanaged = []
-    missing = _flattenConfig(config)
+    missing = _flattenConfig(config, baseDir)
 
-    for root, dirs, files in os.walk("."):
-        currentFolder = root[2:]
+    for root, dirs, files in os.walk("." if baseDir is "" else baseDir):
+        if baseDir is "":
+            currentFolder = root[2:]
+        else:
+            currentFolder = root
         for ignored in [".git"]:
             if ignored in dirs:
                 dirs.remove(ignored)
@@ -58,7 +75,7 @@ def compareConfigToFilesystem():
     return dict(managed=managed, unmanaged=unmanaged, missing=missing)
 
 
-def _flattenConfig(config):
+def _flattenConfig(config, baseDir):
     if config is None:
         config = dict()
 
@@ -84,7 +101,7 @@ def _flattenConfig(config):
             else:
                 raise Exception("Unhandled config type: {}: {}<{}>".format(fullpath, value, type(value)))
 
-    recurse(None, config)
+    recurse(None if baseDir is "" else baseDir, config)
 
     # Require an 'origin' remote
     for key, value in results.items():
@@ -109,14 +126,8 @@ def ignoreInConfig(path):
 
 
 def _addNodeToConfig(path, node):
-    config = None
-    try:
-        with open(".sourcerer.yaml", "r") as configFile:
-            config = yaml.load(configFile)
-    except FileNotFoundError:
-        pass
-    if config is None:
-        config = dict()
+    with open(__yamlFileName, "r") as configFile:
+        config = yaml.load(configFile)
 
     pathParts = path.split(os.sep)
     configNode = config
@@ -127,5 +138,5 @@ def _addNodeToConfig(path, node):
 
     configNode[pathParts[-1]] = node
 
-    with open(".sourcerer.yaml", "w") as configFile:
+    with open(__yamlFileName, "w") as configFile:
         configFile.write(yaml.dump(config, default_flow_style=False))
