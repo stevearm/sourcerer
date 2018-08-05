@@ -21,6 +21,14 @@ def gatherStats(path):
             if localBranchName not in localBranches or branch.object != localBranches[localBranchName].object:
                 unpushed.append(branchName)
         else:
+            # `branch` has a remote branch, but the remote might not exist
+            try:
+                tracking.object # Dereference the remote branch to see it exists
+            except ValueError as e:
+                # `branch` is linked to upstream, but upstream is now missing
+                # Treat as though it was never pushed
+                unpushed.append(branchName)
+                continue
             # `branch` has a remote branch set as upstream
             if branch.object != tracking.object:
                 unpushed.append(branchName)
