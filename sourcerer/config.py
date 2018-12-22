@@ -112,7 +112,9 @@ def _flattenConfig(config, baseDir):
 
 
 def addToConfig(path, remotes):
-    if len(remotes) == 1 and "origin" in remotes:
+    if "origin" not in remotes:
+        raise ValueError("Git repos without a 'origin' remote are not supported")
+    if len(remotes) == 1:
         node = remotes["origin"]
     else:
         node = list()
