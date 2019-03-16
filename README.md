@@ -6,15 +6,24 @@ This is a tool for keeping your source folders up to date, tracking what hasn't 
 1. Install: `pip3 install -e .`
 1. Tag a folder for control: `cd ~/src; touch .sourcerer.yaml`
 
-# Usage
+## Getting started
 
-1. Go to the folder with `.sourcerer.yaml`
+1. Go to the root of all your git repos: `cd ~/src`
+1. Initialize that folder as sourcerer managed: `srcr init`
+  * This creates `.sourcerer.yaml` in the current folder
 1. Show the current status: `srcr status`
-1. Find out more about the status command: `srcr --help status`
-1. Add a git repo to the config: `srcr add utils`
-1. Fetch all repos: `srcr clone`
-1. Get any missing repos: `srcr clone`
-1. Find out about more commands: `srcr --help`
+  * See the status icon legend: `srcr --help status`
+1. Add any repos you care about: `srcr add java/utils`
+1. Ignore any folders you don't want managed: `srcr ignore scratchpad`
+
+## Regular use
+
+## srcr clone
+This will ensure you've got every working copy you should, and that they all have the right remotes.
+
+## srcr fetch
+This will fetch on all managed existing remote on all existing repos. Specify `--purge` if you want to remove local branches that were deleted on the remote.
+
 
 ## To Do
 * Update more commands to handle non-base-dir: add, ignore
