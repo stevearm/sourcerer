@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 
+import logging
 import os
 
 import git
 
 def gatherStats(path):
+    logging.debug("gatherStats({})".format(path))
     repo = git.Repo(path)
     remotes = dict(map(lambda x: (x.name, next(x.urls)), repo.remotes))
 

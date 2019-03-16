@@ -2,6 +2,7 @@
 import argparse
 import os
 import functools
+import logging
 import sys
 
 import colorama
@@ -43,6 +44,11 @@ def main():
     task.set_defaults(func=ignore)
 
     args = parser.parse_args()
+
+    if args.verbose:
+        logging.basicConfig(level=logging.DEBUG)
+        logging.getLogger("git.cmd").setLevel(logging.INFO)
+
     if "func" in args:
         colorama.init()
         if not args.func(args):
