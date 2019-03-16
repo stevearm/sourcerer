@@ -125,7 +125,7 @@ def singleDirStatus(args):
             print()
 
         if len(stats["unpushed"]):
-            print("Branches with no upstream or that differ from upstream")
+            print("Branches with no upstream or that are ahead of upstream")
             for branch in stats["unpushed"]:
                 print(" {}  {}".format(FLAGS["unpushed"], branch))
             print()

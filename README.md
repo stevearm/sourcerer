@@ -18,6 +18,13 @@ This is a tool for keeping your source folders up to date, tracking what hasn't 
 
 ## Regular use
 
+## srcr status
+This will show any repos that have uncommitted changes (with \*) and any commits that have not been pushed to a remote (with ↑). This includes:
+
+* A branch with no upstream branch set
+* A branch where the upstream branch is missing
+* A branch where it has commits ahead of it's upstream
+
 ## srcr clone
 This will ensure you've got every working copy you should, and that they all have the right remotes.
 
@@ -27,5 +34,3 @@ This will fetch on all managed existing remote on all existing repos. Specify `-
 
 ## To Do
 * Update more commands to handle non-base-dir: add, ignore
-* Need a way to fast forward
-  * When we run `srcr fetch` it pulls new remote commits, then master is behind and it looks like unpushed. Need a way to handle this better
