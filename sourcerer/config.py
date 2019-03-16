@@ -29,7 +29,7 @@ def initBaseDir():
 
 def compareConfigToFilesystem(baseDir):
     with open(os.path.join(baseDir, __yamlFileName), "r") as configFile:
-        config = yaml.load(configFile)
+        config = yaml.safe_load(configFile)
 
     managed = {}
     unmanaged = []
@@ -129,7 +129,7 @@ def ignoreInConfig(path):
 
 def _addNodeToConfig(path, node):
     with open(__yamlFileName, "r") as configFile:
-        config = yaml.load(configFile)
+        config = yaml.safe_load(configFile)
 
     pathParts = path.split(os.sep)
     configNode = config
