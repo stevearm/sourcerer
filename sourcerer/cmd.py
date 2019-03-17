@@ -25,6 +25,7 @@ def main():
     task.set_defaults(func=status)
 
     task = tasks.add_parser("clone", help="Clone any missing repos and add any missing remotes")
+    task.add_argument("path", nargs="?", help="Limit task to just one path")
     task.set_defaults(func=clone)
 
     task = tasks.add_parser("fetch", help="Fetch all remotes in config")
@@ -152,8 +153,12 @@ def clone(args):
         return False
     status = sourcerer.config.compareConfigToFilesystem(baseDir)
     for path, pathConfig in status["missing"].items():
+        if args.path and args.path != path:
+            continue
         sourcerer.git.clone(path, pathConfig)
     for path, pathConfig in status["managed"].items():
+        if args.path and args.path != path:
+            continue
         sourcerer.git.ensureRemotes(path, pathConfig)
 
 

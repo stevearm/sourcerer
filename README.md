@@ -26,7 +26,7 @@ This will show any repos that have uncommitted changes (with \*) and any commits
 * A branch where it has commits ahead of it's upstream
 
 ## srcr clone
-This will ensure you've got every working copy you should, and that they all have the right remotes.
+This will ensure you've got every working copy you should, and that they all have the right remotes. If you specify a directory, it will only do so for that directory.
 
 ## srcr fetch
 This will fetch on all managed existing remote on all existing repos. Specify `--purge` if you want to remove local branches that were deleted on the remote.
