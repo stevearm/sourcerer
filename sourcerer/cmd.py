@@ -171,7 +171,10 @@ def fetch(args):
     if len(status["managed"]):
         for path, pathConfig in status["managed"].items():
             print("{} ({})".format(path, ", ".join(pathConfig.keys())))
-            sourcerer.git.fetch(path, pathConfig.keys(), args.purge, not args.no_tags)
+            try:
+                sourcerer.git.fetch(path, pathConfig.keys(), args.purge, not args.no_tags)
+            except ValueError as e:
+                print("Fetch failed: {}".format(e))
 
 
 def init(args):

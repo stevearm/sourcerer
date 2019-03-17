@@ -51,7 +51,11 @@ def gatherStats(path):
 
 def fetch(path, remoteNames, purge, tags):
     repo = git.Git(path)
+    remotes = repo.remote().split("\n") # Is this really the best way to get a list of remote names?
     for remoteName in remoteNames:
+        if remoteName not in remotes:
+            raise ValueError("'{}' not a remote for {}({})".format(remoteName, path, remotes))
+
         # This uses the command-line interface
         # https://github.com/gitpython-developers/GitPython/blob/05e3b0e58487c8515846d80b9fffe63bdcce62e8/git/cmd.py#L970
         response = repo.fetch(remoteName, p=purge, t=tags)
