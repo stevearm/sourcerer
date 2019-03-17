@@ -103,18 +103,13 @@ def _flattenConfig(config, baseDir):
 
     recurse(None if baseDir is "" else baseDir, config)
 
-    # Require an 'origin' remote
-    for key, value in results.items():
-        if isinstance(value, dict) and "origin" not in value:
-            raise ValueError("{} has no origin: {}".format(key, value))
-
     return results
 
 
 def addToConfig(path, remotes):
-    if "origin" not in remotes:
-        raise ValueError("Git repos without a 'origin' remote are not supported")
-    if len(remotes) == 1:
+    if len(remotes) == 0:
+        raise ValueError("Repos with no remotes not allowed")
+    if len(remotes) == 1 and "origin" in remotes:
         node = remotes["origin"]
     else:
         node = list()
