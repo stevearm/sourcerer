@@ -153,6 +153,8 @@ def clone(args):
         return False
     status = sourcerer.config.compareConfigToFilesystem(baseDir)
     for path, pathConfig in status["missing"].items():
+        if pathConfig is False:
+            continue
         if args.path and args.path != path:
             continue
         sourcerer.git.clone(path, pathConfig)
