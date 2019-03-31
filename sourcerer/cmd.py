@@ -22,6 +22,7 @@ def main():
     task = tasks.add_parser("status", help="Show the status of all folders",
                             description="Flags: {}".format(", ".join(["{}: {}".format(key, value) for key, value in sorted(FLAGS.items())])))
     task.add_argument("path", nargs="?", help="The path to show details for")
+    task.add_argument("--show-all", action="store_true", help="Show all folders")
     task.set_defaults(func=status)
 
     task = tasks.add_parser("clone", help="Clone any missing repos and add any missing remotes")
@@ -80,6 +81,9 @@ def status(args):
                      [len(stats["unpushed"]) == 0, FLAGS["unpushed"]],
                      [remotesMatch,                FLAGS["unmanagedRemote"]]]
             flagString = "".join(map(lambda x: " " if x[0] else x[1], flags))
+
+            if not args.show_all and flagString.strip() == "":
+                continue
 
             # Dim unless one of the flags is false
             color = colorama.Style.DIM if functools.reduce(lambda x, y: x and y[0], flags, True) else ""
