@@ -89,10 +89,12 @@ def status(args):
                   colorama.Style.RESET_ALL)
         print()
 
-    if len(status["missing"]):
-        print("Missing folder ({})".format(len(status["missing"])))
+    # Drop missing folders where the config says they're ignored
+    missingFolders = [x for x in status["missing"] if status["missing"][x] is not False]
+    if len(missingFolders):
+        print("Missing folder ({})".format(len(missingFolders)))
         print()
-        for path, pathConfig in status["missing"].items():
+        for path in missingFolders:
             print(colorama.Fore.RED + "     {}".format(path) + colorama.Style.RESET_ALL)
         print()
 
