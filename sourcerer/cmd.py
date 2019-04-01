@@ -45,6 +45,11 @@ def main():
     task.add_argument("path", help="The path to ignore")
     task.set_defaults(func=ignore)
 
+    task = tasks.add_parser("clean", help="Delete branches that are fully pushed upstream")
+    task.add_argument("path", nargs="?", help="Limit task to just one path")
+    task.add_argument("--dry-run", action="store_true", help="Just display what would be deleted but don't delete")
+    task.set_defaults(func=clean)
+
     args = parser.parse_args()
 
     if args.verbose:
@@ -229,3 +234,14 @@ def ignore(args):
         return False
     path = args.path.rstrip(os.sep)
     sourcerer.config.ignoreInConfig(path)
+
+def clean(args):
+    baseDir = sourcerer.config.findBaseDir()
+    if baseDir is None:
+        print("Could not find config")
+        return False
+    status = sourcerer.config.compareConfigToFilesystem(baseDir)
+    for path, pathConfig in status["managed"].items():
+        if args.path and args.path != path:
+            continue
+        print("Should clean out {}".format(path))
