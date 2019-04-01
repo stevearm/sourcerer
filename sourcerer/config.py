@@ -33,6 +33,7 @@ def compareConfigToFilesystem(baseDir):
 
     managed = {}
     unmanaged = []
+    ignored = []
     missing = _flattenConfig(config, baseDir)
 
     for root, dirs, files in os.walk("." if baseDir is "" else baseDir):
@@ -40,9 +41,9 @@ def compareConfigToFilesystem(baseDir):
             currentFolder = root[2:]
         else:
             currentFolder = root
-        for ignored in [".git"]:
-            if ignored in dirs:
-                dirs.remove(ignored)
+        for blacklisted in [".git"]:
+            if blacklisted in dirs:
+                dirs.remove(blacklisted)
 
         isUnmanagedDir = True
         for missingPath, missingConfig in missing.items():
@@ -51,7 +52,7 @@ def compareConfigToFilesystem(baseDir):
             if missingPath == currentFolder:
                 if missingConfig is False:
                     # This is an ignored path so drop it
-                    pass
+                    ignored.append(missingPath)
                 else:
                     # Move the config from missing to managed
                     managed[missingPath] = missingConfig
@@ -72,7 +73,7 @@ def compareConfigToFilesystem(baseDir):
             del dirs[:]
             unmanaged.append(currentFolder)
 
-    return dict(managed=managed, unmanaged=unmanaged, missing=missing)
+    return dict(managed=managed, unmanaged=unmanaged, missing=missing, ignored=ignored)
 
 
 def _flattenConfig(config, baseDir):

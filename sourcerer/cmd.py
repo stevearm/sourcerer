@@ -95,11 +95,20 @@ def status(args):
 
     # Drop missing folders where the config says they're ignored
     missingFolders = [x for x in status["missing"] if status["missing"][x] is not False]
+    if args.show_all:
+        missingFolders = status["missing"]
     if len(missingFolders):
         print("Missing folder ({})".format(len(missingFolders)))
         print()
         for path in missingFolders:
             print(colorama.Fore.RED + "     {}".format(path) + colorama.Style.RESET_ALL)
+        print()
+
+    if args.show_all and len(status["ignored"]):
+        print("Ignored ({})".format(len(status["ignored"])))
+        print()
+        for path in status["ignored"]:
+            print(colorama.Style.DIM + "     {}".format(path) + colorama.Style.RESET_ALL)
         print()
 
     if len(status["unmanaged"]):
