@@ -70,8 +70,7 @@ def status(args):
         return False
     status = sourcerer.config.compareConfigToFilesystem(baseDir)
     if len(status["managed"]):
-        print("Managed folders ({})".format(len(status["managed"])))
-        print()
+        lines = []
         for path, pathConfig in status["managed"].items():
             stats = sourcerer.git.gatherStats(path)
 
@@ -88,10 +87,15 @@ def status(args):
             # Dim unless one of the flags is false
             color = colorama.Style.DIM if functools.reduce(lambda x, y: x and y[0], flags, True) else ""
 
-            print(color +
-                  "  {flags} {path}".format(flags=flagString, path=path) +
-                  colorama.Style.RESET_ALL)
-        print()
+            lines.append(color +
+                         "  {flags} {path}".format(flags=flagString, path=path) +
+                         colorama.Style.RESET_ALL)
+        if (len(lines)):
+            print("Managed folders ({})".format(len(status["managed"])))
+            print()
+            for line in lines:
+                print(line)
+            print()
 
     # Drop missing folders where the config says they're ignored
     missingFolders = [x for x in status["missing"] if status["missing"][x] is not False]
