@@ -196,6 +196,9 @@ def fetch(args):
                 sourcerer.git.fetch(path, pathConfig.keys(), args.purge, not args.no_tags)
             except ValueError as e:
                 print("Fetch failed: {}".format(e))
+            except Exception as e:
+                print("Unknown failure on {}".format(path))
+                raise e
 
 
 def init(args):
