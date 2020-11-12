@@ -56,6 +56,7 @@ def fetch(path, remoteNames, purge, tags):
         if remoteName not in remotes:
             raise ValueError("'{}' not a remote for {}({})".format(remoteName, path, remotes))
 
+        logging.debug("Fetching {} in {} with purge={} tags={}".format(remoteName, path, purge, tags))
         # This uses the command-line interface
         # https://github.com/gitpython-developers/GitPython/blob/05e3b0e58487c8515846d80b9fffe63bdcce62e8/git/cmd.py#L970
         response = repo.fetch(remoteName, p=purge, t=tags)
@@ -68,6 +69,7 @@ def fetch(path, remoteNames, purge, tags):
 def clone(path, remotes):
     if os.path.isdir(path):
         raise Exception("Cannot clone into existing location")
+    logging.debug("Cloning into {}: {}".format(path, remotes))
     repo = git.Repo.clone_from(remotes["origin"], path)
     ensureRemotes(path, remotes)
 
