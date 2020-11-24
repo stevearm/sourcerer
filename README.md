@@ -31,6 +31,8 @@ This will ensure you've got every working copy you should, and that they all hav
 ## srcr fetch
 This will fetch on all managed existing remote on all existing repos. Specify `--purge` if you want to remove local branches that were deleted on the remote.
 
+## srcr cleanup
+This removes code from your machine that are persisted elsewhere. For all managed folders, it deletes local branches that are already pushed and switches to `master`. If run with `--remove`, it will remove any working copies that just have `master` and it is synced with remote.
 
 ## To Do
 * Update more commands to handle non-base-dir: add, ignore
