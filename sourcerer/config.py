@@ -12,7 +12,7 @@ def findBaseDir(wd=""):
             return wd
         if os.path.abspath(wd) == "/":
             return None
-        if wd is "":
+        if wd == "":
             wd = ".."
         else:
             wd = os.path.join(wd, "..")
@@ -36,8 +36,8 @@ def compareConfigToFilesystem(baseDir):
     ignored = []
     missing = _flattenConfig(config, baseDir)
 
-    for root, dirs, files in os.walk("." if baseDir is "" else baseDir):
-        if baseDir is "":
+    for root, dirs, files in os.walk("." if baseDir == "" else baseDir):
+        if baseDir == "":
             currentFolder = root[2:]
         else:
             currentFolder = root
@@ -102,7 +102,7 @@ def _flattenConfig(config, baseDir):
             else:
                 raise Exception("Unhandled config type: {}: {}<{}>".format(fullpath, value, type(value)))
 
-    recurse(None if baseDir is "" else baseDir, config)
+    recurse(None if baseDir == "" else baseDir, config)
 
     return results
 
