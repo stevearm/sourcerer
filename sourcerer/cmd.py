@@ -48,6 +48,7 @@ def main():
     task = tasks.add_parser("clean", help="Delete branches that are fully pushed upstream")
     task.add_argument("path", nargs="?", help="Limit task to just one path")
     task.add_argument("--dry-run", action="store_true", help="Just display what would be deleted but don't delete")
+    task.add_argument("--remove", action="store_true", help="Remove any working copies that have no remaining local changes")
     task.set_defaults(func=clean)
 
     args = parser.parse_args()
@@ -244,4 +245,24 @@ def clean(args):
     for path, pathConfig in status["managed"].items():
         if args.path and args.path != path:
             continue
-        print("Should clean out {}".format(path))
+
+        stats = sourcerer.git.gatherStats(path)
+
+        if not stats["clean"]:
+            if args.verbose:
+                print("Skipping unclean working copy: {}".format(path))
+            continue
+
+        if len(stats["unpushed"]) > 0:
+            if args.verbose:
+                print("Skipping {} because of unpushed changes: {}".format(path, stats["unpushed"]))
+            continue
+
+        if args.dry_run:
+            print("Should clean out {}".format(path))
+            continue
+
+        if args.remove:
+            raise Exception("--remove not yet implemented")
+
+        raise Exception("Not yet implemented")
